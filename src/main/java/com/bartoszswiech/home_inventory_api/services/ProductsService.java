@@ -9,6 +9,7 @@ import com.bartoszswiech.home_inventory_api.repositories.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,6 +33,8 @@ public class ProductsService {
     }
 
     public List<Product> findAll() {
+
+
         return productRepository.findAll();
     }
 
