@@ -17,15 +17,15 @@ This is the backend service for the [Home Inventory Mobile App](https://github.c
 
 1. Clone the repository:
 
-   ```bash
-   git clone https://github.com/clickerrr/home-inventory-api.git
-   cd home-inventory-api
-   ```
+```bash
+git clone https://github.com/clickerrr/home-inventory-api.git
+cd home-inventory-api
+```
    
 2. Start the service:
 
-  ```bash
-  docker-compose up --build
-  ```
+```bash
+docker-compose up --build
+```
 
   Ensure the java application is running, and the API should be available on ```http://localhost:8080```
