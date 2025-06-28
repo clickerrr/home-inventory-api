@@ -4,6 +4,7 @@ import com.bartoszswiech.home_inventory_api.beans.NutritionalInformation;
 import com.bartoszswiech.home_inventory_api.beans.Product;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryAlreadyExistsException;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryNotFoundException;
+import com.bartoszswiech.home_inventory_api.interfaces.ProductView;
 import com.bartoszswiech.home_inventory_api.repositories.NutritionalInformationRepository;
 import com.bartoszswiech.home_inventory_api.repositories.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Service
 public class ProductsService {
+
 
 
     private final ProductRepository productRepository;
@@ -37,6 +39,18 @@ public class ProductsService {
 
         return productRepository.findAll();
     }
+
+    /*
+    ------------ Experiment ------------
+     */
+    public List<ProductView> getNecessaryProductInformation() {
+        return productRepository.findAllBy();
+
+    }
+
+    /*
+    ------------ Experiment ------------
+     */
 
     public List<NutritionalInformation> findAllNutritional(){
         return nutritionalInformationRepository.findAll();

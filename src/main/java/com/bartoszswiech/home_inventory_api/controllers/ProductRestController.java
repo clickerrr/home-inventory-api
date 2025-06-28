@@ -2,6 +2,7 @@ package com.bartoszswiech.home_inventory_api.controllers;
 
 import com.bartoszswiech.home_inventory_api.beans.NutritionalInformation;
 import com.bartoszswiech.home_inventory_api.beans.Product;
+import com.bartoszswiech.home_inventory_api.interfaces.ProductView;
 import com.bartoszswiech.home_inventory_api.services.ProductsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +21,8 @@ public class ProductRestController {
     // Aggregate root
     // tag::get-aggregate-root[]
     @GetMapping("/products")
-    List<Product> all() {
-        return productsService.findAll();
+    List<ProductView> all() {
+        return productsService.getNecessaryProductInformation();
     }
     // end::get-aggregate-root[]
 
