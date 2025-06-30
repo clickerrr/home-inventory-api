@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -24,6 +25,7 @@ public class LoggedItemRestController {
     // tag::get-aggregate-root[]
     @GetMapping("/loggedItems")
     List<LoggedItem> all() {
+
         return loggedItemService.findAll();
     }
     // end::get-aggregate-root[]
@@ -31,6 +33,7 @@ public class LoggedItemRestController {
     @PostMapping("/loggedItem")
     LoggedItem newLoggedItem(@RequestBody LoggedItem newLoggedItem, @RequestParam String upca, @RequestParam Long locationId,
                              @RequestParam Long inventoryId) {
+
         return loggedItemService.createLoggedItem(newLoggedItem, upca, locationId, inventoryId);
     }
 

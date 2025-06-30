@@ -52,4 +52,14 @@ public class Location {
     public void setLoggedItems(Set<LoggedItem> loggedItems) {
         this.loggedItems = loggedItems;
     }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", room=" + room +
+                ", loggedItems=" + loggedItems +
+                '}';
+    }
 }

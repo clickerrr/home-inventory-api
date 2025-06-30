@@ -38,4 +38,13 @@ public class House {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    @Override
+    public String toString() {
+        return "House{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", rooms=" + rooms +
+                '}';
+    }
 }

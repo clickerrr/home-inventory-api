@@ -1,10 +1,13 @@
 package com.bartoszswiech.home_inventory_api.controllers;
 
 import com.bartoszswiech.home_inventory_api.beans.Location;
+import com.bartoszswiech.home_inventory_api.beans.LoggedItem;
+import com.bartoszswiech.home_inventory_api.interfaces.LoggedItemWithProduct;
 import com.bartoszswiech.home_inventory_api.services.LocationService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/locations")
@@ -19,6 +22,11 @@ public class LocationRestController {
     @GetMapping
     public List<Location> getAllLocations() {
         return locationService.findAll();
+    }
+
+    @GetMapping("/{id}/loggedItems")
+    public List<LoggedItemWithProduct> getAllLoggedItems(@PathVariable Long id) {
+        return locationService.getLocationLoggedItems(id);
     }
 
     @PostMapping

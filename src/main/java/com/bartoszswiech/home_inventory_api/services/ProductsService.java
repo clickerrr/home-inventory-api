@@ -16,8 +16,6 @@ import java.util.List;
 @Service
 public class ProductsService {
 
-
-
     private final ProductRepository productRepository;
     private final NutritionalInformationRepository nutritionalInformationRepository;
     ProductsService(ProductRepository productRepository, NutritionalInformationRepository nutritionalInformationRepository) {

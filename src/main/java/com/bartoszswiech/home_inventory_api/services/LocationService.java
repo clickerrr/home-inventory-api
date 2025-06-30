@@ -1,26 +1,33 @@
 package com.bartoszswiech.home_inventory_api.services;
 
 import com.bartoszswiech.home_inventory_api.beans.Location;
+import com.bartoszswiech.home_inventory_api.beans.LoggedItem;
 import com.bartoszswiech.home_inventory_api.beans.Product;
 import com.bartoszswiech.home_inventory_api.beans.Room;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryAlreadyExistsException;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryNotFoundException;
+import com.bartoszswiech.home_inventory_api.interfaces.LoggedItemWithProduct;
 import com.bartoszswiech.home_inventory_api.repositories.LocationRepository;
+import com.bartoszswiech.home_inventory_api.repositories.LoggedItemRepository;
 import com.bartoszswiech.home_inventory_api.repositories.RoomRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class LocationService {
 
     private final LocationRepository locationRepository;
     private final RoomRepository roomRepository;
+    private final LoggedItemRepository loggedItemRepository;
 
-    public LocationService(LocationRepository locationRepository, RoomRepository roomRepository) {
+    public LocationService(LocationRepository locationRepository, RoomRepository roomRepository, LoggedItemRepository loggedItemRepository) {
         this.locationRepository = locationRepository;
         this.roomRepository = roomRepository;
+        this.loggedItemRepository = loggedItemRepository;
     }
 
     @Transactional
@@ -46,8 +53,23 @@ public class LocationService {
     }
 
     public Location findById(Long id) {
+
         return locationRepository.findById(id).orElseThrow(() -> new EntryNotFoundException(id.toString()));
     }
+
+    public List<LoggedItemWithProduct> getLocationLoggedItems(Long id) {
+        Location location = locationRepository.findById(id).orElseThrow(() -> new EntryNotFoundException(id.toString()));
+        Set<LoggedItem> locationItems = location.getLoggedItems();
+        List<LoggedItemWithProduct> fullLoggedItems = new ArrayList<LoggedItemWithProduct>();
+        locationItems.forEach( loggedItem -> {
+            LoggedItemWithProduct result = loggedItemRepository.findLoggedItemWithProduct(loggedItem.getId());
+            if(result != null) {
+                fullLoggedItems.add(result);
+            }
+        });
+        return fullLoggedItems;
+    }
+
 
     @Transactional
     public Location update(Long id, Location updatedLocation) {

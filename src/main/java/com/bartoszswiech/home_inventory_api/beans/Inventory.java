@@ -29,4 +29,12 @@ public class Inventory {
     public void setLoggedItems(Set<LoggedItem> loggedItems) {
         this.loggedItems = loggedItems;
     }
+
+    @Override
+    public String toString() {
+        return "Inventory{" +
+                "id=" + id +
+                ", loggedItems=" + loggedItems +
+                '}';
+    }
 }

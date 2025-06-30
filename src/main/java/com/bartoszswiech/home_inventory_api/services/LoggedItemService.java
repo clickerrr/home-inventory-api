@@ -48,7 +48,7 @@ public class LoggedItemService {
         // Fetch the Product entity
         Product product = productRepository.findById(upca)
                 .orElseThrow(() -> new EntryNotFoundException("Product not found with UPCA: " + upca));
-
+        System.out.println(product);
         // Set the relationships
         newLoggedItem.setLocation(location);
         newLoggedItem.setInventory(inventory);
@@ -62,10 +62,11 @@ public class LoggedItemService {
             newLoggedItem.setConsumeByDate(dateLogged.plusWeeks(1));
         }
         LoggedItem savedLoggedItem = loggedItemRepository.save(newLoggedItem);
-
+        System.out.println("Saved logged item");
         // Update the bidirectional relationships
         location.getLoggedItems().add(savedLoggedItem);
         inventory.getLoggedItems().add(savedLoggedItem);
+
 
         return savedLoggedItem;
     }

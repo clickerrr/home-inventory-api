@@ -1,10 +1,12 @@
 package com.bartoszswiech.home_inventory_api.controllers;
 
+import com.bartoszswiech.home_inventory_api.beans.Location;
 import com.bartoszswiech.home_inventory_api.beans.Room;
 import com.bartoszswiech.home_inventory_api.services.RoomService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/rooms")
@@ -30,6 +32,12 @@ public class RoomRestController {
     public Room getRoom(@PathVariable Long id) {
         return roomService.findById(id);
     }
+
+    @GetMapping("/{id}/locations")
+    public Set<Location> getRoomLocations(@PathVariable Long id) {
+        return roomService.getAllLocations(id);
+    }
+
 
     @PutMapping("/{id}")
     public Room updateRoom(@RequestBody Room updatedRoom, @PathVariable Long id) {

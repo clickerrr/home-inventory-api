@@ -91,4 +91,17 @@ public class LoggedItem {
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
     }
+
+    @Override
+    public String toString() {
+        return "LoggedItem{" +
+                "id=" + id +
+                ", dateLogged=" + dateLogged +
+                ", expirationDate=" + expirationDate +
+                ", consumeByDate=" + consumeByDate +
+                ", product=" + product +
+                ", location=" + location +
+                ", inventory=" + inventory +
+                '}';
+    }
 }

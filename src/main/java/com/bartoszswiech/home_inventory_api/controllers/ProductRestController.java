@@ -24,6 +24,11 @@ public class ProductRestController {
     List<ProductView> all() {
         return productsService.getNecessaryProductInformation();
     }
+
+    @GetMapping("/productsFull")
+    List<Product> fullAll() {
+        return productsService.findAll();
+    }
     // end::get-aggregate-root[]
 
     // Aggregate root

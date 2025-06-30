@@ -56,4 +56,14 @@ public class Room {
     public void setHouse(House house) {
         this.house = house;
     }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", locations=" + locations.toString() +
+                ", house=" + house.toString() +
+                '}';
+    }
 }
