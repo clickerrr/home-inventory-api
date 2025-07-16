@@ -6,6 +6,7 @@ import com.bartoszswiech.home_inventory_api.beans.Product;
 import com.bartoszswiech.home_inventory_api.beans.Room;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryAlreadyExistsException;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryNotFoundException;
+import com.bartoszswiech.home_inventory_api.exceptions.ItemsExistException;
 import com.bartoszswiech.home_inventory_api.interfaces.LoggedItemWithProduct;
 import com.bartoszswiech.home_inventory_api.repositories.LocationRepository;
 import com.bartoszswiech.home_inventory_api.repositories.LoggedItemRepository;
@@ -73,11 +74,13 @@ public class LocationService {
 
     @Transactional
     public Location update(Long id, Location updatedLocation) {
+
         return locationRepository.findById(id)
                 .map(location -> {
+
                     // Update fields as necessary
                     location.setTitle(updatedLocation.getTitle());
-                    location.setRoom(updatedLocation.getRoom());
+
                     return locationRepository.save(location);
                 })
                 .orElseGet(() -> {
@@ -85,7 +88,11 @@ public class LocationService {
                 });
     }
 
-    public void deleteById(Long id) {
+    public boolean deleteById(Long id) {
+
+        Location returnedLocation = locationRepository.findById(id).orElseThrow( () -> new EntryNotFoundException(id.toString()));
+        if(!returnedLocation.getLoggedItems().isEmpty()) throw new ItemsExistException();
         locationRepository.deleteById(id);
+        return true;
     }
 }

@@ -19,6 +19,9 @@ public class House {
     @JsonManagedReference(value = "house_rooms")
     private Set<Room> rooms = new HashSet<Room>();
 
+    @ManyToMany(mappedBy = "houses")
+    private Set<User> users;
+
     public Set<Room> getRooms() {
         return rooms;
     }
