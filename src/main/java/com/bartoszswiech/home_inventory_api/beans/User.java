@@ -16,7 +16,9 @@ public class User {
     private String lastName;
 
     private String email;
-    private String encodedPassword;
+    private String username;
+    private String password;
+
 
 
     @ManyToMany
@@ -25,6 +27,8 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "house_id"))
     private Set<House> houses;
+
+
 
     public Long getId() {
         return id;
@@ -50,12 +54,12 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getEncodedPassword() {
-        return encodedPassword;
+    public String getPassword() {
+        return password;
     }
 
-    public void setEncodedPassword(String encodedPassword) {
-        this.encodedPassword = encodedPassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getEmail() {
@@ -74,15 +78,13 @@ public class User {
         this.houses = houses;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", encodedPassword='" + encodedPassword + '\'' +
-                ", houses=" + houses +
-                '}';
+    public String getUsername() {
+        return username;
     }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+
 }

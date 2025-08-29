@@ -33,9 +33,11 @@ public class ProductsService {
     }
 
     public List<Product> findAll() {
-
-
-        return productRepository.findAll();
+        long start = System.currentTimeMillis();
+        List<Product> allProducts = productRepository.findAll();
+        long end = System.currentTimeMillis();
+        System.out.print("Time took for retrieval: " + (end - start) * 60 );
+        return allProducts;
     }
 
     /*
@@ -55,7 +57,11 @@ public class ProductsService {
     }
 
     public Product findById(String upca) {
-        return productRepository.findById(upca).orElseThrow(() -> new EntryNotFoundException(upca));
+        long start = System.currentTimeMillis();
+        Product foundProduct =  productRepository.findById(upca).orElseThrow(() -> new EntryNotFoundException(upca));
+        long end = System.currentTimeMillis();
+        System.out.print("Time took for retrieval: " + (end - start) * 60 );
+        return foundProduct;
     }
 
 

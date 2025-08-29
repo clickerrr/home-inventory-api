@@ -2,11 +2,23 @@ package com.bartoszswiech.home_inventory_api.services;
 
 import com.bartoszswiech.home_inventory_api.beans.House;
 import com.bartoszswiech.home_inventory_api.beans.User;
-import com.bartoszswiech.home_inventory_api.exceptions.EntryAlreadyExistsException;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryNotFoundException;
 import com.bartoszswiech.home_inventory_api.repositories.UserRepository;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import jakarta.transaction.Transactional;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.apache.coyote.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,38 +26,43 @@ import java.util.Set;
 
 @Service
 public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    AuthenticationManager authManager;
 
-    private final UserRepository userRepository;
+    @Autowired
+    private JWTService jwtService;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private BCryptPasswordEncoder passEncoder = new BCryptPasswordEncoder(10);
 
     @Transactional
-    public User createUser(User newUser) {
-        if (newUser.getId() != null && userRepository.existsById(newUser.getId())) {
-            throw new EntryAlreadyExistsException(newUser.getId().toString());
-        }
-
-//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-//        newUser.setEncodedPassword(passwordEncoder.encode(newUser.getEncodedPassword()));
-        return userRepository.save(newUser);
+    public boolean createUser(User newUser) {
+        String encodedPassword = passEncoder.encode(newUser.getPassword());
+        newUser.setPassword(encodedPassword);
+        userRepository.save(newUser);
+        return true;
     }
 
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
-    public boolean verifyUser(String email, String inputtedPassword) {
-//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
-        User returnedUser = userRepository.findByEmail(email);
-        if(returnedUser == null) {
-            throw new EntryNotFoundException("User does not exist");
-        }
+    public String verifyUser(User userToVerify) {
 
-//        return passwordEncoder.matches(inputtedPassword, returnedUser.getEncodedPassword());
-        return false;
+            Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(userToVerify.getUsername(), userToVerify.getPassword()));
+
+            if(authentication.isAuthenticated()) {
+                String authToken = jwtService.generateToken(userToVerify.getUsername());
+                String refreshToken = jwtService.generateRefreshToken(userToVerify.getUsername());
+                JsonObject value = Json.createObjectBuilder()
+                        .add("authToken", authToken)
+                        .add("refreshToken", refreshToken).build();
+                return value.toString();
+            }
+
+            return "User not verified";
     }
 
     public User findById(Long id) {
@@ -73,4 +90,8 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    public String getNewToken() {
+        String authedUser = (SecurityContextHolder.getContext().getAuthentication().getName());
+        return jwtService.generateToken(authedUser);
+    }
 }
