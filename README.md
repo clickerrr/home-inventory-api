@@ -7,7 +7,7 @@ This is the backend service for the [Home Inventory Mobile App](https://github.c
 ## 🚀 Tech Stack
 
 - Java 21
-- Spring Boot (Web, Data JPA)
+- Spring Boot (Web, Data JPA, Security)
 - MySQL
 - Docker
 
