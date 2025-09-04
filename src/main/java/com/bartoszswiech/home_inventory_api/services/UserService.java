@@ -3,6 +3,7 @@ package com.bartoszswiech.home_inventory_api.services;
 import com.bartoszswiech.home_inventory_api.beans.House;
 import com.bartoszswiech.home_inventory_api.beans.User;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryNotFoundException;
+import com.bartoszswiech.home_inventory_api.exceptions.UserAlreadyExistsException;
 import com.bartoszswiech.home_inventory_api.repositories.UserRepository;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -37,7 +38,21 @@ public class UserService {
     private BCryptPasswordEncoder passEncoder = new BCryptPasswordEncoder(10);
 
     @Transactional
-    public boolean createUser(User newUser) {
+    public boolean createUser(User newUser) throws UserAlreadyExistsException {
+
+        String providedUsername = newUser.getUsername();
+        String providedEmail  = newUser.getEmail();
+
+        // TODO: add error checking for no username and email provided. right now we are assuming that a perfect request has been passed.
+        if(findUser(providedUsername) != null) {
+            throw new UserAlreadyExistsException();
+        }
+
+        if(providedEmail != null) {
+            if (findUserByEmail(providedEmail) != null) {
+                throw new UserAlreadyExistsException();
+            }
+        }
         String encodedPassword = passEncoder.encode(newUser.getPassword());
         newUser.setPassword(encodedPassword);
         userRepository.save(newUser);
@@ -46,6 +61,14 @@ public class UserService {
 
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    public User findUser(String usernameToFind) {
+        return userRepository.findByUsername(usernameToFind);
+    }
+
+    public User findUserByEmail(String emailToFind) {
+        return userRepository.findByEmail(emailToFind);
     }
 
 

@@ -86,5 +86,8 @@ public class User {
         this.username = username;
     }
 
-
+    @Override
+    public String toString() {
+        return String.format("[id: %d, firstName: %s, lastName: %s, email: %s, username: %s", getId(), getFirstName(), getLastName(), getEmail(), getUsername());
+    }
 }
