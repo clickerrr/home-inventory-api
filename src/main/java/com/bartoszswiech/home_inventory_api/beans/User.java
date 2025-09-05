@@ -19,6 +19,7 @@ public class User {
     private String username;
     private String password;
 
+    private boolean admin = false;
 
 
     @ManyToMany
@@ -74,6 +75,11 @@ public class User {
         return houses;
     }
 
+    public void addHouse(House newHouse) {
+        if(newHouse == null) throw new IllegalArgumentException("newHouse argument can not be null");
+        this.houses.add(newHouse);
+    }
+
     public void setHouses(Set<House> houses) {
         this.houses = houses;
     }
@@ -86,8 +92,16 @@ public class User {
         this.username = username;
     }
 
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
     @Override
     public String toString() {
-        return String.format("[id: %d, firstName: %s, lastName: %s, email: %s, username: %s", getId(), getFirstName(), getLastName(), getEmail(), getUsername());
+        return String.format("[id: %d, firstName: %s, lastName: %s, email: %s, username: %s, admin: %b", getId(), getFirstName(), getLastName(), getEmail(), getUsername(), isAdmin());
     }
 }

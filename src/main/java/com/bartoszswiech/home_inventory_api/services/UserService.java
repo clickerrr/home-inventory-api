@@ -43,7 +43,7 @@ public class UserService {
         String providedUsername = newUser.getUsername();
         String providedEmail  = newUser.getEmail();
 
-        // TODO: add error checking for no username and email provided. right now we are assuming that a perfect request has been passed.
+        // TODO: add error checking for no username and email provided. right now we are assuming that a perfect request has been passed.Î
         if(findUser(providedUsername) != null) {
             throw new UserAlreadyExistsException();
         }

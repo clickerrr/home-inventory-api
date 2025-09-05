@@ -46,8 +46,7 @@ public class House {
     public String toString() {
         return "House{" +
                 "id=" + id +
-                ", title='" + title + '\'' +
-                ", rooms=" + rooms +
+                ", title='" + title +
                 '}';
     }
 }

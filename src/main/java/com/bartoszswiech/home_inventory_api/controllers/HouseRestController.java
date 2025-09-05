@@ -2,6 +2,8 @@ package com.bartoszswiech.home_inventory_api.controllers;
 
 import com.bartoszswiech.home_inventory_api.beans.House;
 import com.bartoszswiech.home_inventory_api.services.HouseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
