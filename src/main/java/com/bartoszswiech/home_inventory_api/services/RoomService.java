@@ -39,8 +39,10 @@ public class RoomService {
         return roomRepository.save(newRoom);
     }
 
-    public List<Room> findAll() {
-        return roomRepository.findAll();
+    public List<Room> findAll(Long houseId) {
+        House associatedHouse = houseRepository.findById(houseId).orElseThrow();
+
+        return associatedHouse.getRooms().stream().toList();
     }
 
     public Room findById(Long id) {

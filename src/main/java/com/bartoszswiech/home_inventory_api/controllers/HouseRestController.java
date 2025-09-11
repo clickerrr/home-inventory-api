@@ -2,7 +2,9 @@ package com.bartoszswiech.home_inventory_api.controllers;
 
 import com.bartoszswiech.home_inventory_api.beans.House;
 import com.bartoszswiech.home_inventory_api.services.HouseService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 

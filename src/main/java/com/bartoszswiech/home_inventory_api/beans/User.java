@@ -1,8 +1,13 @@
 package com.bartoszswiech.home_inventory_api.beans;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
 import java.util.Set;
+
 
 @Entity
 public class User {
@@ -27,6 +32,7 @@ public class User {
             name = "users_in_house",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "house_id"))
+
     private Set<House> houses;
 
 

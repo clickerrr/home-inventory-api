@@ -5,6 +5,7 @@ import com.bartoszswiech.home_inventory_api.beans.Room;
 import com.bartoszswiech.home_inventory_api.beans.User;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryAlreadyExistsException;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryNotFoundException;
+import com.bartoszswiech.home_inventory_api.exceptions.UserNotFoundException;
 import com.bartoszswiech.home_inventory_api.repositories.HouseRepository;
 import com.bartoszswiech.home_inventory_api.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,19 +42,31 @@ public class HouseService {
         return houseRepository.save(newHouse);
     }
 
+
     public List<House> findAll() {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         Set<House> foundHouses = userRepository.findByUsername(currentUsername).getHouses();
-        System.out.println(foundHouses);
-        List<House> returnList = null;
-        if(foundHouses != null) {
-            returnList = foundHouses.stream().toList();
+        System.out.println("!!!!! found houses " + foundHouses.toString());
+        List<House> returnList = new ArrayList<House>();
+
+        for(House foundHouse: foundHouses) {
+            System.out.println(foundHouse);
+            returnList.add(foundHouse);
         }
         return returnList;
     }
 
     public House findById(Long id) {
         return houseRepository.findById(id).orElseThrow(() -> new EntryNotFoundException(id.toString()));
+    }
+
+    public boolean currentUserInHouse(House houseToCheck) throws UserNotFoundException {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User associatedUser = userRepository.findByUsername(currentUsername);
+        if(associatedUser == null) {
+            throw new UserNotFoundException();
+        }
+        return houseToCheck.getUsers().contains(associatedUser);
     }
 
     @Transactional
