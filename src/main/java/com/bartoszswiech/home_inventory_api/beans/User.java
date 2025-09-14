@@ -1,9 +1,6 @@
 package com.bartoszswiech.home_inventory_api.beans;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -32,7 +29,7 @@ public class User {
             name = "users_in_house",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "house_id"))
-
+    @JsonIgnore
     private Set<House> houses;
 
 
@@ -108,6 +105,6 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("[id: %d, firstName: %s, lastName: %s, email: %s, username: %s, admin: %b", getId(), getFirstName(), getLastName(), getEmail(), getUsername(), isAdmin());
+        return String.format("[id: %d, firstName: %s, lastName: %s, email: %s, username: %s, admin: %b]", getId(), getFirstName(), getLastName(), getEmail(), getUsername(), isAdmin());
     }
 }

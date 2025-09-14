@@ -4,6 +4,7 @@ import com.bartoszswiech.home_inventory_api.beans.House;
 import com.bartoszswiech.home_inventory_api.beans.User;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryNotFoundException;
 import com.bartoszswiech.home_inventory_api.exceptions.UserAlreadyExistsException;
+import com.bartoszswiech.home_inventory_api.interfaces.UserView;
 import com.bartoszswiech.home_inventory_api.repositories.UserRepository;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -57,10 +58,6 @@ public class UserService {
         newUser.setPassword(encodedPassword);
         userRepository.save(newUser);
         return true;
-    }
-
-    public List<User> findAll() {
-        return userRepository.findAll();
     }
 
     public User findUser(String usernameToFind) {

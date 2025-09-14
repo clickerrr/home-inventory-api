@@ -4,6 +4,7 @@ import com.bartoszswiech.home_inventory_api.beans.JWTRefreshRequestBody;
 import com.bartoszswiech.home_inventory_api.beans.Room;
 import com.bartoszswiech.home_inventory_api.beans.User;
 import com.bartoszswiech.home_inventory_api.exceptions.UserAlreadyExistsException;
+import com.bartoszswiech.home_inventory_api.interfaces.UserView;
 import com.bartoszswiech.home_inventory_api.services.RoomService;
 import com.bartoszswiech.home_inventory_api.services.UserService;
 import org.apache.coyote.Response;

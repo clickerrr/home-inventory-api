@@ -1,5 +1,6 @@
 package com.bartoszswiech.home_inventory_api.beans;
 
+import com.bartoszswiech.home_inventory_api.exceptions.UserAlreadyExistsException;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -23,17 +24,24 @@ public class House {
     @JsonManagedReference(value = "house_rooms")
     private Set<Room> rooms = new HashSet<Room>();
 
-    @JsonIgnore
+
     @ManyToMany(mappedBy = "houses")
     private Set<User> users;
 
     public Set<Room> getRooms() {
-        return rooms;
+        return Set.copyOf(rooms);
     }
 
-    public void setRooms(Set<Room> rooms) {
-        this.rooms = rooms;
+    public void setRooms(Set<Room> updatedRooms) {
+        this.rooms = updatedRooms;
     }
+
+    // TODO: prevent direct modification of rooms object
+//    public int updateRooms(Set<Room> updatedRooms) {
+//        for (Room updatedRoom : updatedRooms) {
+//
+//        }
+//    }
 
     public Long getId() {
         return id;
@@ -48,10 +56,8 @@ public class House {
     }
 
     public Set<User> getUsers() {
-        return users;
+        return Set.copyOf(users);
     }
-
-
 
     @Override
     public String toString() {
@@ -59,5 +65,19 @@ public class House {
                 "id=" + id +
                 ", title='" + title +
                 '}';
+    }
+
+    public void addUserToHouse(User foundUser) throws UserAlreadyExistsException {
+        if( foundUser == null) {
+            return;
+        }
+
+        if(users.contains(foundUser)) {
+            throw new UserAlreadyExistsException();
+        }
+
+        System.out.println("Adding user to house " + foundUser.getUsername());
+        users.add(foundUser);
+
     }
 }

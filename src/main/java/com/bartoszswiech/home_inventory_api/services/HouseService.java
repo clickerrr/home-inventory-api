@@ -5,11 +5,15 @@ import com.bartoszswiech.home_inventory_api.beans.Room;
 import com.bartoszswiech.home_inventory_api.beans.User;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryAlreadyExistsException;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryNotFoundException;
+import com.bartoszswiech.home_inventory_api.exceptions.UserAlreadyExistsException;
 import com.bartoszswiech.home_inventory_api.exceptions.UserNotFoundException;
+import com.bartoszswiech.home_inventory_api.interfaces.UserView;
 import com.bartoszswiech.home_inventory_api.repositories.HouseRepository;
 import com.bartoszswiech.home_inventory_api.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.PermissionDeniedDataAccessException;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -29,6 +33,9 @@ public class HouseService {
     private UserRepository userRepository;
     @Autowired
     private HouseRepository houseRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Transactional
     public House createHouse(House newHouse) {
@@ -74,8 +81,8 @@ public class HouseService {
         return houseRepository.findById(id)
                 .map(house -> {
                     // Update fields as necessary
-                    Set<Room> rooms = updatedHouse.getRooms();
-                    house.setRooms(rooms);
+                    Set<Room> newRooms = updatedHouse.getRooms();
+                    house.setRooms(newRooms);
                     house.setTitle(updatedHouse.getTitle());
                     return houseRepository.save(house);
                 })
@@ -86,5 +93,48 @@ public class HouseService {
 
     public void deleteById(Long id) {
         houseRepository.deleteById(id);
+    }
+
+    public List<UserView> getUserDetails(Long houseId) {
+        House foundHouse = houseRepository.findById(houseId).orElseThrow();
+
+        System.out.println(foundHouse.getId());
+        System.out.println(foundHouse.getUsers().toString());
+        if(currentUserInHouse(foundHouse) ){
+            List<UserView> returnedUsers = foundHouse.getUsers().stream().map(user -> userRepository.findUserViewById(user.getId())).toList();
+            return returnedUsers;
+        }
+
+        return new ArrayList<UserView>();
+    }
+
+    @Transactional
+    public void addUserToHouse(User userDetails, Long houseId) throws UserAlreadyExistsException, UserNotFoundException {
+        House foundHouse = houseRepository.findById(houseId).orElseThrow();
+
+        if(currentUserInHouse(foundHouse)) {
+
+            String username = userDetails.getUsername();
+            String email = userDetails.getEmail();
+            User foundUser = null;
+            if(username != null) {
+                foundUser = userRepository.findByUsername(username);
+            }
+            if(foundUser == null && email != null) {
+                foundUser = userRepository.findByEmail(email);
+            }
+
+            if(foundUser == null) {
+                throw new UserNotFoundException();
+            }
+
+            foundHouse.addUserToHouse(foundUser);
+            foundUser.addHouse(foundHouse);
+            userRepository.save(foundUser);
+            houseRepository.save(foundHouse);
+
+            return;
+        }
+        System.out.println("!!!!!!!!Current user is not in the house");
     }
 }
