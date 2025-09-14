@@ -5,6 +5,7 @@ import com.bartoszswiech.home_inventory_api.beans.Location;
 import com.bartoszswiech.home_inventory_api.beans.House;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryAlreadyExistsException;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryNotFoundException;
+import com.bartoszswiech.home_inventory_api.exceptions.ItemsExistException;
 import com.bartoszswiech.home_inventory_api.repositories.RoomRepository;
 import com.bartoszswiech.home_inventory_api.repositories.HouseRepository;
 import jakarta.transaction.Transactional;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class RoomService {
@@ -37,8 +39,10 @@ public class RoomService {
         return roomRepository.save(newRoom);
     }
 
-    public List<Room> findAll() {
-        return roomRepository.findAll();
+    public List<Room> findAll(Long houseId) {
+        House associatedHouse = houseRepository.findById(houseId).orElseThrow();
+
+        return associatedHouse.getRooms().stream().toList();
     }
 
     public Room findById(Long id) {
@@ -54,9 +58,6 @@ public class RoomService {
         return roomRepository.findById(id)
                 .map(room -> {
                     room.setTitle(updatedRoom.getTitle());
-                    Set<Location> locations = updatedRoom.getLocations();
-                    room.setLocations(locations);
-                    room.setHouse(updatedRoom.getHouse());
                     return roomRepository.save(room);
                 })
                 .orElseGet(() -> {
@@ -65,6 +66,17 @@ public class RoomService {
     }
 
     public void deleteById(Long id) {
+
+        Room returnedRoom = roomRepository.findById(id).orElseThrow( () -> new EntryNotFoundException(id.toString()));
+
+        Set<Location> locations = returnedRoom.getLocations();
+
+        locations.forEach( location -> {
+            if(!location.getLoggedItems().isEmpty()) {
+                throw new ItemsExistException();
+            }
+        });
+
         roomRepository.deleteById(id);
     }
 }

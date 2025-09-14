@@ -1,11 +1,16 @@
 package com.bartoszswiech.home_inventory_api.beans;
 
+import com.bartoszswiech.home_inventory_api.exceptions.UserAlreadyExistsException;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 
 @Entity
 public class House {
@@ -19,13 +24,24 @@ public class House {
     @JsonManagedReference(value = "house_rooms")
     private Set<Room> rooms = new HashSet<Room>();
 
+
+    @ManyToMany(mappedBy = "houses")
+    private Set<User> users;
+
     public Set<Room> getRooms() {
-        return rooms;
+        return Set.copyOf(rooms);
     }
 
-    public void setRooms(Set<Room> rooms) {
-        this.rooms = rooms;
+    public void setRooms(Set<Room> updatedRooms) {
+        this.rooms = updatedRooms;
     }
+
+    // TODO: prevent direct modification of rooms object
+//    public int updateRooms(Set<Room> updatedRooms) {
+//        for (Room updatedRoom : updatedRooms) {
+//
+//        }
+//    }
 
     public Long getId() {
         return id;
@@ -39,12 +55,29 @@ public class House {
         this.title = title;
     }
 
+    public Set<User> getUsers() {
+        return Set.copyOf(users);
+    }
+
     @Override
     public String toString() {
         return "House{" +
                 "id=" + id +
-                ", title='" + title + '\'' +
-                ", rooms=" + rooms +
+                ", title='" + title +
                 '}';
+    }
+
+    public void addUserToHouse(User foundUser) throws UserAlreadyExistsException {
+        if( foundUser == null) {
+            return;
+        }
+
+        if(users.contains(foundUser)) {
+            throw new UserAlreadyExistsException();
+        }
+
+        System.out.println("Adding user to house " + foundUser.getUsername());
+        users.add(foundUser);
+
     }
 }

@@ -3,6 +3,9 @@ package com.bartoszswiech.home_inventory_api.controllers;
 import com.bartoszswiech.home_inventory_api.beans.Location;
 import com.bartoszswiech.home_inventory_api.beans.Room;
 import com.bartoszswiech.home_inventory_api.services.RoomService;
+import org.apache.coyote.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,15 +15,18 @@ import java.util.Set;
 @RequestMapping("/rooms")
 public class RoomRestController {
 
-    private final RoomService roomService;
-
-    public RoomRestController(RoomService roomService) {
-        this.roomService = roomService;
-    }
+    @Autowired
+    private RoomService roomService;
 
     @GetMapping
-    public List<Room> getAllRooms() {
-        return roomService.findAll();
+    public ResponseEntity<List<Room>> getRoomsByHouse(@RequestParam Long houseId) {
+        try {
+            return ResponseEntity.ok( roomService.findAll(houseId));
+        }
+        catch(Exception ex) {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
     @PostMapping
@@ -29,7 +35,7 @@ public class RoomRestController {
     }
 
     @GetMapping("/{id}")
-    public Room getRoom(@PathVariable Long id) {
+    public Room getRoomById(@PathVariable Long id) {
         return roomService.findById(id);
     }
 
@@ -47,5 +53,6 @@ public class RoomRestController {
     @DeleteMapping("/{id}")
     public void deleteRoom(@PathVariable Long id) {
         roomService.deleteById(id);
+
     }
 }

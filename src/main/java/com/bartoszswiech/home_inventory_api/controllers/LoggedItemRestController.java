@@ -52,6 +52,7 @@ public class LoggedItemRestController {
 
     @DeleteMapping("/loggedItem/{id}")
     void deleteProduct(@PathVariable Long id) {
+        System.out.println(id);
         loggedItemService.deleteById(id);
     }
 }
