@@ -1,6 +1,7 @@
 package com.bartoszswiech.home_inventory_api.services;
 
 import com.bartoszswiech.home_inventory_api.beans.House;
+import com.bartoszswiech.home_inventory_api.beans.Inventory;
 import com.bartoszswiech.home_inventory_api.beans.Room;
 import com.bartoszswiech.home_inventory_api.beans.User;
 import com.bartoszswiech.home_inventory_api.exceptions.EntryAlreadyExistsException;
@@ -9,6 +10,7 @@ import com.bartoszswiech.home_inventory_api.exceptions.UserAlreadyExistsExceptio
 import com.bartoszswiech.home_inventory_api.exceptions.UserNotFoundException;
 import com.bartoszswiech.home_inventory_api.interfaces.UserView;
 import com.bartoszswiech.home_inventory_api.repositories.HouseRepository;
+import com.bartoszswiech.home_inventory_api.repositories.InventoryRepository;
 import com.bartoszswiech.home_inventory_api.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 @Service
@@ -33,6 +36,8 @@ public class HouseService {
     private UserRepository userRepository;
     @Autowired
     private HouseRepository houseRepository;
+    @Autowired
+    private InventoryRepository inventoryRepository;
 
     @Autowired
     private UserService userService;
@@ -44,6 +49,7 @@ public class HouseService {
         }
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         User associatedUser = userRepository.findByUsername(currentUsername);
+        newHouse.addUserToHouse(associatedUser);
         associatedUser.addHouse(newHouse);
 
         return houseRepository.save(newHouse);
@@ -63,78 +69,87 @@ public class HouseService {
         return returnList;
     }
 
-    public House findById(Long id) {
-        return houseRepository.findById(id).orElseThrow(() -> new EntryNotFoundException(id.toString()));
+    public House findById(Long id) throws UserNotFoundException {
+
+        House foundHouse = houseRepository.findById(id).orElseThrow(() -> new EntryNotFoundException(id.toString()));
+        checkIfCurrentUserInHouse(foundHouse);
+
+        return foundHouse;
     }
 
-    public boolean currentUserInHouse(House houseToCheck) throws UserNotFoundException {
+    public void checkIfCurrentUserInHouse(House houseToCheck) throws UserNotFoundException {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         User associatedUser = userRepository.findByUsername(currentUsername);
         if(associatedUser == null) {
             throw new UserNotFoundException();
         }
-        return houseToCheck.getUsers().contains(associatedUser);
     }
 
     @Transactional
     public House update(Long id, House updatedHouse) {
-        return houseRepository.findById(id)
-                .map(house -> {
-                    // Update fields as necessary
-                    Set<Room> newRooms = updatedHouse.getRooms();
-                    house.setRooms(newRooms);
-                    house.setTitle(updatedHouse.getTitle());
-                    return houseRepository.save(house);
-                })
-                .orElseGet(() -> {
-                    return houseRepository.save(updatedHouse);
-                });
+
+        House foundHouse = houseRepository.findById(id).orElseThrow();
+
+        checkIfCurrentUserInHouse(foundHouse);
+
+        Set<Room> newRooms = updatedHouse.getRooms();
+        foundHouse.setRooms(newRooms);
+        foundHouse.setTitle(updatedHouse.getTitle());
+
+        houseRepository.save(foundHouse);
+
+        return foundHouse;
     }
 
     public void deleteById(Long id) {
         houseRepository.deleteById(id);
     }
 
-    public List<UserView> getUserDetails(Long houseId) {
+    public List<UserView> getUserDetails(Long houseId) throws UserNotFoundException {
         House foundHouse = houseRepository.findById(houseId).orElseThrow();
 
         System.out.println(foundHouse.getId());
         System.out.println(foundHouse.getUsers().toString());
-        if(currentUserInHouse(foundHouse) ){
-            List<UserView> returnedUsers = foundHouse.getUsers().stream().map(user -> userRepository.findUserViewById(user.getId())).toList();
-            return returnedUsers;
-        }
 
-        return new ArrayList<UserView>();
+        checkIfCurrentUserInHouse(foundHouse);
+
+        return foundHouse.getUsers().stream().map(user -> userRepository.findUserViewById(user.getId())).toList();
+
     }
 
     @Transactional
     public void addUserToHouse(User userDetails, Long houseId) throws UserAlreadyExistsException, UserNotFoundException {
         House foundHouse = houseRepository.findById(houseId).orElseThrow();
 
-        if(currentUserInHouse(foundHouse)) {
+        checkIfCurrentUserInHouse(foundHouse);
 
-            String username = userDetails.getUsername();
-            String email = userDetails.getEmail();
-            User foundUser = null;
-            if(username != null) {
-                foundUser = userRepository.findByUsername(username);
-            }
-            if(foundUser == null && email != null) {
-                foundUser = userRepository.findByEmail(email);
-            }
-
-            if(foundUser == null) {
-                throw new UserNotFoundException();
-            }
-
-            foundHouse.addUserToHouse(foundUser);
-            foundUser.addHouse(foundHouse);
-            userRepository.save(foundUser);
-            houseRepository.save(foundHouse);
-
-            return;
+        String username = userDetails.getUsername();
+        String email = userDetails.getEmail();
+        User foundUser = null;
+        if(username != null) {
+            foundUser = userRepository.findByUsername(username);
         }
-        System.out.println("!!!!!!!!Current user is not in the house");
+        if(foundUser == null && email != null) {
+            foundUser = userRepository.findByEmail(email);
+        }
+
+        if(foundUser == null) {
+            throw new UserNotFoundException();
+        }
+
+        foundHouse.addUserToHouse(foundUser);
+        foundUser.addHouse(foundHouse);
+        userRepository.save(foundUser);
+        houseRepository.save(foundHouse);
+
+    }
+
+    @Transactional
+    public void addInventoryToHouse(Long houseId, Long inventoryId) throws UserNotFoundException, NoSuchElementException {
+        Inventory foundInventory = inventoryRepository.findById(inventoryId).orElseThrow();
+        House foundHouse = findById(houseId);
+        foundInventory.setAssociatedHouse(foundHouse);
+        inventoryRepository.save(foundInventory);
+
     }
 }

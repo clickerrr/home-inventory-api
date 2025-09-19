@@ -1,5 +1,6 @@
 package com.bartoszswiech.home_inventory_api.interfaces;
 
+import com.bartoszswiech.home_inventory_api.beans.Location;
 import com.bartoszswiech.home_inventory_api.beans.LoggedItem;
 import com.bartoszswiech.home_inventory_api.beans.Product;
 
@@ -11,4 +12,5 @@ public interface LoggedItemWithProduct {
     LocalDate getExpirationDate();
     LocalDate getConsumeByDate();
     ProductView getProduct();
+    LocationView getLocation();
 }

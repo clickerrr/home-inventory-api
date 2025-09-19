@@ -46,12 +46,17 @@ public class Location {
     }
 
     public Set<LoggedItem> getLoggedItems() {
-        return loggedItems;
+        return Set.copyOf(loggedItems);
     }
 
-    public void setLoggedItems(Set<LoggedItem> loggedItems) {
-        this.loggedItems = loggedItems;
+    public void addLoggedItem(LoggedItem newLoggedItem) {
+        if(newLoggedItem == null) {
+            throw new IllegalArgumentException();
+        }
+        loggedItems.add(newLoggedItem);
     }
+
+
 
     @Override
     public String toString() {
@@ -59,7 +64,6 @@ public class Location {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", room=" + room +
-                ", loggedItems=" + loggedItems +
                 '}';
     }
 }

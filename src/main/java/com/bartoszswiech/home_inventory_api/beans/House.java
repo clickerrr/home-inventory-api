@@ -28,6 +28,10 @@ public class House {
     @ManyToMany(mappedBy = "houses")
     private Set<User> users;
 
+    @OneToMany(mappedBy = "associatedHouse", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "house_inventory")
+    private Set<Inventory> inventories;
+
     public Set<Room> getRooms() {
         return Set.copyOf(rooms);
     }
@@ -68,16 +72,34 @@ public class House {
     }
 
     public void addUserToHouse(User foundUser) throws UserAlreadyExistsException {
-        if( foundUser == null) {
+        if (foundUser == null) {
             return;
         }
 
-        if(users.contains(foundUser)) {
+        if (users.contains(foundUser)) {
             throw new UserAlreadyExistsException();
         }
 
         System.out.println("Adding user to house " + foundUser.getUsername());
         users.add(foundUser);
+
+    }
+
+    public Set<Inventory> getInventories() {
+        return Set.copyOf(this.inventories);
+    }
+
+    public void addAnInventory(Inventory newInventory) {
+        if (newInventory == null) {
+            throw new IllegalArgumentException();
+        }
+        this.inventories.add(newInventory);
+    }
+
+    public void updateInventory(Inventory inventoryToUpdate) {
+        if (inventoryToUpdate == null) {
+            throw new IllegalArgumentException();
+        }
 
     }
 }

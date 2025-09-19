@@ -80,7 +80,7 @@ public class LoggedItem {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(LocatioqSn location) {
         this.location = location;
     }
 
@@ -101,7 +101,7 @@ public class LoggedItem {
                 ", consumeByDate=" + consumeByDate +
                 ", product=" + product +
                 ", location=" + location +
-                ", inventory=" + inventory +
+                ", inventory=" + inventory.getId() +
                 '}';
     }
 }

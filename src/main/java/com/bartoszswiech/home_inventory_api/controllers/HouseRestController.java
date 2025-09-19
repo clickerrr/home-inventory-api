@@ -81,4 +81,15 @@ public class HouseRestController {
         }
 
     }
+
+    @PostMapping("/inventory")
+    public ResponseEntity<String> addInventoryToHouse(@RequestParam Long houseId, @RequestParam Long inventoryId) {
+        try {
+            houseService.addInventoryToHouse(houseId, inventoryId);
+            return ResponseEntity.ok(String.format("Added inventory with id: %d to house with id: %d", inventoryId, houseId));
+        } catch(UserNotFoundException ex) {
+            return ResponseEntity.status(401).build();
+        }
+    }
+
 }
