@@ -80,7 +80,7 @@ public class LoggedItem {
         return location;
     }
 
-    public void setLocation(LocatioqSn location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 
